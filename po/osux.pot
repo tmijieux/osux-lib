@@ -1,0 +1,247 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Thomas Mijieux, Lucas Maugère
+# This file is distributed under the same license as the osux package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: osux 0.1\n"
+"Report-Msgid-Bugs-To: tmijieux@hotmail.fr, lmaugere@ipb.fr\n"
+"POT-Creation-Date: 2016-09-26 00:09+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/lib/util/yaml.c:40
+#, c-format
+msgid "yaml list start:\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:46
+#, c-format
+msgid "yaml list end\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:49
+#, c-format
+msgid "yaml table start:\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:51
+#, c-format
+msgid "yaml table end\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:58 src/lib/util/yaml.c:213
+msgid "invalid yaml type encountered"
+msgstr ""
+
+#: src/lib/util/yaml.c:74
+msgid "invalid container\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:118
+msgid "Failed to initialize yaml parser!\n"
+msgstr ""
+
+#: src/lib/util/yaml.c:133
+#, c-format
+msgid "Yaml parser error %d\n"
+msgstr ""
+
+#: src/lib/beatmap/hitobject.c:131
+msgid "Whistle "
+msgstr ""
+
+#: src/lib/beatmap/hitobject.c:132
+msgid "Finish "
+msgstr ""
+
+#: src/lib/beatmap/hitobject.c:133
+msgid "Clap "
+msgstr ""
+
+#: src/include/osux/event.h:21
+msgid "BackgroundImage"
+msgstr ""
+
+#: src/include/osux/event.h:22
+msgid "Video"
+msgstr ""
+
+#: src/include/osux/event.h:23
+msgid "BreakPeriod"
+msgstr ""
+
+#: src/include/osux/event.h:24
+msgid "BackgroundColour"
+msgstr ""
+
+#: src/include/osux/event.h:25
+msgid "Sprite"
+msgstr ""
+
+#: src/include/osux/event.h:26
+msgid "Sample"
+msgstr ""
+
+#: src/include/osux/event.h:27
+msgid "Animation"
+msgstr ""
+
+#: src/include/osux/event.h:30
+msgid "Fade"
+msgstr ""
+
+#: src/include/osux/event.h:31
+msgid "Move"
+msgstr ""
+
+#: src/include/osux/event.h:32
+msgid "MoveX"
+msgstr ""
+
+#: src/include/osux/event.h:33
+msgid "MoveY"
+msgstr ""
+
+#: src/include/osux/event.h:34
+msgid "Scale"
+msgstr ""
+
+#: src/include/osux/event.h:35
+msgid "VectorScale"
+msgstr ""
+
+#: src/include/osux/event.h:36
+msgid "Rotate"
+msgstr ""
+
+#: src/include/osux/event.h:37
+msgid "Color"
+msgstr ""
+
+#: src/include/osux/event.h:38
+msgid "Parameter"
+msgstr ""
+
+#: src/include/osux/event.h:39
+msgid "Loop"
+msgstr ""
+
+#: src/include/osux/event.h:40
+msgid "Trigger"
+msgstr ""
+
+#: src/include/osux/event.h:43
+msgid "Background"
+msgstr ""
+
+#: src/include/osux/event.h:44
+msgid "Fail"
+msgstr ""
+
+#: src/include/osux/event.h:45
+msgid "Pass"
+msgstr ""
+
+#: src/include/osux/event.h:46
+msgid "Foreground"
+msgstr ""
+
+#: src/include/osux/event.h:49
+msgid "LoopOnce"
+msgstr ""
+
+#: src/include/osux/event.h:50
+msgid "LoopForever"
+msgstr ""
+
+#: src/include/osux/event.h:53
+msgid "TopLeft"
+msgstr ""
+
+#: src/include/osux/event.h:54
+msgid "TopCentre"
+msgstr ""
+
+#: src/include/osux/event.h:55
+msgid "TopRight"
+msgstr ""
+
+#: src/include/osux/event.h:56
+msgid "CentreLeft"
+msgstr ""
+
+#: src/include/osux/event.h:57
+msgid "Centre"
+msgstr ""
+
+#: src/include/osux/event.h:58
+msgid "CentreRight"
+msgstr ""
+
+#: src/include/osux/event.h:59
+msgid "BottomLeft"
+msgstr ""
+
+#: src/include/osux/event.h:60
+msgid "BottomCentre"
+msgstr ""
+
+#: src/include/osux/event.h:61
+msgid "BottomRight"
+msgstr ""
+
+#: src/include/osux/hitsound.h:38
+msgid "Default"
+msgstr ""
+
+#: src/include/osux/hitsound.h:39
+msgid "Normal"
+msgstr ""
+
+#: src/include/osux/hitsound.h:40
+msgid "Soft"
+msgstr ""
+
+#: src/include/osux/hitsound.h:41
+msgid "Drum"
+msgstr ""
+
+#: src/include/osux/color.h:27
+msgid "Combo"
+msgstr ""
+
+#: src/include/osux/color.h:28
+msgid "MenuGlow"
+msgstr ""
+
+#: src/include/osux/color.h:29
+msgid "SliderBorder"
+msgstr ""
+
+#: src/include/osux/color.h:30
+msgid "SpinnerApproachCircle"
+msgstr ""
+
+#: src/include/osux/color.h:31
+msgid "SongSelectActiveText"
+msgstr ""
+
+#: src/include/osux/color.h:32
+msgid "SongSelectInactiveText"
+msgstr ""
+
+#: src/include/osux/color.h:33
+msgid "StarBreakAdditive"
+msgstr ""
+
+#: src/include/osux/color.h:34
+msgid "SliderTrackOverride"
+msgstr ""
