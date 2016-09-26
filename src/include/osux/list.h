@@ -23,7 +23,7 @@
 
 typedef struct osux_list_ osux_list;
 
-#include "osux/hash_table.h"
+#include <osux/hash_table.h>
 
 G_BEGIN_DECLS
 

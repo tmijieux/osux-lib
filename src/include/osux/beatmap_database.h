@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <glib.h>
 
-#include "osux/database.h"
+#include <osux/database.h>
 
 G_BEGIN_DECLS
 

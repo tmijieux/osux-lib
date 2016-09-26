@@ -24,14 +24,14 @@
 #include <openssl/md5.h>
 #include <glib.h>
 
-#include "osux/compiler.h"
-#include "osux/hitobject.h"
-#include "osux/game_mode.h"
-#include "osux/hash_table.h"
+#include <osux/compiler.h>
+#include <osux/hitobject.h>
+#include <osux/game_mode.h>
+#include <osux/hash_table.h>
 
-#include "osux/color.h"
-#include "osux/timingpoint.h"
-#include "osux/event.h"
+#include <osux/color.h>
+#include <osux/timingpoint.h>
+#include <osux/event.h>
 
 G_BEGIN_DECLS
 

@@ -60,7 +60,7 @@ typedef struct osux_event_command_ osux_event_command;
     ORIG(7, N_("BottomCentre"), BOTTOM_CENTRE)  \
     ORIG(8, N_("BottomRight"),  BOTTOM_RIGHT)   \
 
-#include "osux/event_enum.h"
+#include "./event_enum.h"
 
 struct osux_event_object_ {
     char *filename;
@@ -130,7 +130,7 @@ char const *osux_event_detail_string(osux_event *ev);
     ((type) == EVENT_COMMAND_TRIGGER || (type) == EVENT_COMMAND_LOOP)
 
 
-#include "event_string.h"
+#include "./event_string.h"
 
 #undef OSUX_EVENT_HEADER_INSIDE
 

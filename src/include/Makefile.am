@@ -28,7 +28,8 @@ nobase_include_HEADERS = \
 	osux/color.h \
 	osux/hitobject.h \
 	osux/event.h \
-	osux/parser.h \
+	osux/event_string.h \
+	osux/event_enum.h \
 	osux/game_mode.h \
 	osux/table.h \
 	osux/compiler.h \

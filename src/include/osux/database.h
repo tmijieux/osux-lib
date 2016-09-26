@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include <stdbool.h>
 #include <glib.h>
-#include "osux/list.h"
+#include <osux/list.h>
 
 G_BEGIN_DECLS
 

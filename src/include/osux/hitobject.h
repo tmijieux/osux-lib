@@ -22,9 +22,9 @@
 #include <stdbool.h>
 #include <glib.h>
 
-#include "osux/compiler.h"
-#include "osux/timingpoint.h"
-#include "osux/color.h"
+#include <osux/compiler.h>
+#include <osux/timingpoint.h>
+#include <osux/color.h>
 
 G_BEGIN_DECLS
 

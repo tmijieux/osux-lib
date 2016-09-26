@@ -22,7 +22,6 @@
 #include "osux/beatmap.h"
 #include "osux/error.h"
 #include "osux/data.h"
-#include "osux/parser.h"
 #include "osux/hitobject.h"
 #include "osux/timingpoint.h"
 #include "osux/hitsound.h"

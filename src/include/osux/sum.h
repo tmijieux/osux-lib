@@ -18,7 +18,7 @@
  */
 
 #include <glib.h>
-#include "osux/heap.h"
+#include <osux/heap.h>
 
 G_BEGIN_DECLS
 

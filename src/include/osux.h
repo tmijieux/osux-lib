@@ -29,7 +29,6 @@
 #include "./osux/color.h"
 #include "./osux/hitobject.h"
 #include "./osux/event.h"
-#include "./osux/parser.h"
 #include "./osux/game_mode.h"
 #include "./osux/table.h"
 #include "./osux/compiler.h"

@@ -8,10 +8,10 @@ G_BEGIN_DECLS
 
 typedef struct osux_hit_ osux_hit;
 
-#include "osux/util.h"
-#include "osux/mods.h"
-#include "osux/hitobject.h"
-#include "osux/replay.h"
+#include <osux/util.h>
+#include <osux/mods.h>
+#include <osux/hitobject.h>
+#include <osux/replay.h>
 
 extern char const *hit_str[];
 

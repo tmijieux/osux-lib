@@ -27,8 +27,8 @@ typedef struct osux_replay_data_ osux_replay_data;
 typedef struct osux_replay_life_ osux_replay_life;
 typedef struct osux_replay_ osux_replay;
 
-#include "osux/beatmap.h"
-#include "osux/hit.h"
+#include <osux/beatmap.h>
+#include <osux/hit.h>
 
 G_BEGIN_DECLS
 

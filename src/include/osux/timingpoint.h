@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <glib.h>
 
-#include "osux/compiler.h"
+#include <osux/compiler.h>
 
 G_BEGIN_DECLS
 
