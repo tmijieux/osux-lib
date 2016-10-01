@@ -1,6 +1,5 @@
 include $(top_srcdir)/common.mk
 
-
 noinst_LTLIBRARIES= libosux_beatmap.la
 libosux_beatmap_la_SOURCES = \
 	beatmap.c \
@@ -13,5 +12,6 @@ libosux_beatmap_la_SOURCES = \
 	hitobject.c \
 	timingpoint.c \
 	taiko_autoconvert.c \
-	hitsound.c
+	hitsound.c \
+	combo.c
 

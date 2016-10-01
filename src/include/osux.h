@@ -32,6 +32,7 @@
 #include "./osux/game_mode.h"
 #include "./osux/table.h"
 #include "./osux/compiler.h"
+#include "./osux/combo.h"
 
 #ifdef _WIN32
 # include "./osux/windows.h"

@@ -22,9 +22,12 @@
 #include <stdbool.h>
 #include <glib.h>
 
+typedef struct osux_hitobject_ osux_hitobject;
+
 #include <osux/compiler.h>
 #include <osux/timingpoint.h>
 #include <osux/color.h>
+#include <osux/combo.h>
 
 G_BEGIN_DECLS
 
@@ -75,20 +78,20 @@ typedef struct osux_point_ {
 } osux_point;
 
 typedef struct osux_hitsound_ {
-    int sample;
-    bool have_addon;
     int sample_type;
-    int addon_sample_type;
-    int sample_set_index;
+    bool have_addon;
+    int sample_set;
+    int addon_sample_set;
+    int sample_bank;
     int volume;
     char *sfx_filename;
 } osux_hitsound;
 
 typedef struct osux_edgehitsound_ {
     // hitsound on slider extremities ('edge')
-    int sample;
     int sample_type;
-    int addon_sample_type;
+    int sample_set;
+    int addon_sample_set;
 } osux_edgehitsound;
 
 typedef struct osux_slider_ {
@@ -101,7 +104,7 @@ typedef struct osux_slider_ {
     osux_edgehitsound *edgehitsounds; // bufsize = 0 or 'repeat'
 } osux_slider;
 
-typedef struct osux_hitobject_ {
+struct osux_hitobject_ {
     int x;
     int y;
     int64_t offset;
@@ -124,12 +127,12 @@ typedef struct osux_hitobject_ {
 
     gpointer data;
     GDestroyNotify free_data;
-} osux_hitobject;
+};
 
 int MUST_CHECK osux_hitobject_init(
     osux_hitobject *ho, char *line, uint32_t osu_version);
 int osux_hitobject_prepare(osux_hitobject *ho,
-                           int combo_id, int combo_pos, osux_color *color,
+                           osux_combo const *combo,
                            osux_timingpoint const *tp);
 void osux_hitobject_print(osux_hitobject *ho, int version, FILE *f);
 void osux_hitobject_free(osux_hitobject *ho);

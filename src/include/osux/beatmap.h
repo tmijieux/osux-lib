@@ -24,18 +24,17 @@
 #include <openssl/md5.h>
 #include <glib.h>
 
+typedef struct osux_beatmap_ osux_beatmap;
+
 #include <osux/compiler.h>
 #include <osux/hitobject.h>
 #include <osux/game_mode.h>
 #include <osux/hash_table.h>
-
 #include <osux/color.h>
 #include <osux/timingpoint.h>
 #include <osux/event.h>
 
 G_BEGIN_DECLS
-
-typedef struct osux_beatmap_ osux_beatmap;
 
 struct osux_beatmap_ {
     uint32_t beatmap_id;

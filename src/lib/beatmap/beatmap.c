@@ -13,6 +13,7 @@
 #include "osux/util.h"
 #include "osux/hitsound.h"
 #include "osux/mods.h"
+#include "osux/combo.h"
 
 int osux_beatmap_free(osux_beatmap *beatmap)
 {
@@ -353,7 +354,7 @@ static void fetch_tags(osux_beatmap *beatmap)
 
 static int64_t parse_sample_set(gchar const *sample_set)
 {
-    SAMPLE_SETS(MATCH_SAMPLE_SET_);
+    SAMPLE_SET(MATCH_SAMPLE_SET_);
     return -1;
 }
 
@@ -386,33 +387,6 @@ prepare_colors(osux_beatmap *beatmap)
     }
 }
 
-static void
-osux_combo_init(osux_combo *combo, osux_beatmap *beatmap)
-{
-    memset(combo, 0, sizeof *combo);
-    combo->colours = beatmap->combo_colours;
-    combo->current = g_list_last(combo->colours);
-}
-
-static void osux_combo_next(osux_combo *combo, osux_hitobject *ho)
-{
-    if (HIT_OBJECT_IS_NEWCOMBO(ho)) {
-        if (combo->current->next == NULL)
-            combo->current = combo->colours;
-        else
-            combo->current = combo->current->next;
-        ++ combo->id;
-        combo->pos = 1;
-    } else
-        ++ combo->pos;
-}
-
-static osux_color*
-osux_combo_colour(osux_combo *combo)
-{
-    return (osux_color*) combo->current->data;
-}
-
 static int prepare_hitobjects(osux_beatmap *beatmap)
 {
     int err = 0;
@@ -429,9 +403,10 @@ static int prepare_hitobjects(osux_beatmap *beatmap)
 	    current_tp++;
 
         osux_combo_next(&combo, ho);
-	err = osux_hitobject_prepare(ho, combo.id, combo.pos,
-                                     osux_combo_colour(&combo),
-                                     &beatmap->timingpoints[current_tp]);
+
+        osux_timingpoint *tp;
+        tp = &beatmap->timingpoints[current_tp];
+	err = osux_hitobject_prepare(ho, &combo, tp);
     }
     return err;
 }

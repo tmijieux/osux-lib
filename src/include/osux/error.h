@@ -29,8 +29,8 @@ G_BEGIN_DECLS
     ERROR(OSUX_ERR_INVALID_HITOBJECT_SPINNER)           \
     ERROR(OSUX_ERR_INVALID_HITOBJECT_HOLD)              \
     ERROR(OSUX_ERR_INVALID_HITOBJECT_ADDON_HITSOUND)    \
-    ERROR(OSUX_ERR_INVALID_HITOBJECT_EDGE_SAMPLE)       \
-    ERROR(OSUX_ERR_INVALID_HITOBJECT_EDGE_SAMPLE_TYPE)  \
+    ERROR(OSUX_ERR_INVALID_SLIDER_EDGE_SAMPLE_TYPE)     \
+    ERROR(OSUX_ERR_INVALID_SLIDER_EDGE_SAMPLE_SET)      \
     ERROR(OSUX_ERR_INVALID_HITOBJECT_SLIDER_TYPE)       \
     ERROR(OSUX_ERR_INVALID_HITOBJECT_SLIDER_POINTS)     \
     ERROR(OSUX_ERR_INVALID_EVENT)                       \
@@ -86,10 +86,6 @@ char const *osux_errmsg(int errcode);
                 __LINE__, __PRETTY_FUNCTION__);                 \
         fprintf(stderr, (format_), ##__VA_ARGS__);              \
     } while(0)
-
-
-#define osux_malloc(size_) g_malloc0(size_)
-#define osux_free(ptr_) g_free(ptr_)
 
 
 #ifdef DEBUG

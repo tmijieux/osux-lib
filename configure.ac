@@ -1,4 +1,4 @@
-AC_INIT([osux], [0.1], [lmaugere@ipb.fr, tmijieux@ipb.fr])
+AC_INIT([osux], [0.1.1], [lmaugere@ipb.fr, tmijieux@ipb.fr])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_SILENT_RULES([yes])
 

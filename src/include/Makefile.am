@@ -33,4 +33,5 @@ nobase_include_HEADERS = \
 	osux/game_mode.h \
 	osux/table.h \
 	osux/compiler.h \
-	osux/windows.h
+	osux/windows.h \
+	osux/combo.h

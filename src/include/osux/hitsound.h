@@ -22,7 +22,7 @@
 
 G_BEGIN_DECLS
 
-enum hitsound_sample {
+enum hitsound_sample_type {
     SAMPLE_NORMAL  = 0x00,
     SAMPLE_UNK1    = 0x01,
     SAMPLE_WHISTLE = 0x02,
@@ -34,7 +34,7 @@ enum hitsound_sample {
     SAMPLE_TAIKO_BIG = SAMPLE_FINISH,
 };
 
-#define SAMPLE_SETS(SET)                        \
+#define SAMPLE_SET(SET)                         \
     SET(0, DEFAULT, N_("Default"))              \
     SET(1, NORMAL, N_("Normal"))                \
     SET(2, SOFT, N_("Soft"))                    \
@@ -46,9 +46,13 @@ gchar const *osux_sample_set_get_localized_name(int sample_set);
 #define SAMPLE_SET_TO_ENUM_(value_, caps_, pretty_)     \
     SAMPLE_TYPE_##caps_ = (value_),
 
-enum hitsound_sample_type {
-    SAMPLE_SETS(SAMPLE_SET_TO_ENUM_)
+enum hitsound_sample_set {
+    SAMPLE_SET(SAMPLE_SET_TO_ENUM_)
     MAX_SAMPLE_TYPE,
+};
+
+enum hitsound_sample_bank {
+    SAMPLE_BANK_DEFAULT = 0,
 };
 
 G_END_DECLS

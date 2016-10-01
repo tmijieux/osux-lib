@@ -51,13 +51,6 @@ typedef struct osux_color_ {
     int32_t a;
 } osux_color;
 
-typedef struct osux_combo_ {
-    uint32_t id;
-    uint32_t pos;
-    GList *colours;
-    GList *current;
-} osux_combo;
-
 char const *osux_color_type_get_name(int type);
 int osux_color_init(osux_color *c, char *line, uint32_t osu_version);
 void osux_color_free(osux_color *c);

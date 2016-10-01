@@ -4,7 +4,7 @@
     [(value_)] = (pretty_),
 
 static gchar const *sample_set_str[] = {
-    SAMPLE_SETS(TO_STRING_ARRAY_)
+    SAMPLE_SET(TO_STRING_ARRAY_)
 };
 
 gchar const *osux_sample_set_get_name(int sample_set)
