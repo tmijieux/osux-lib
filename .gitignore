@@ -48,6 +48,7 @@ Makefile.in
 /missing
 /ar-lib
 /stamp-h?
+/ABOUT-NLS
 .deps/
 .dirstamp
 .libs/
