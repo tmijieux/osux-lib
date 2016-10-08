@@ -6,23 +6,25 @@
 G_BEGIN_DECLS
 
 enum taiko_keys {
-    LEFT_DON    =   1,
-    LEFT_KAT    =   2,
-    RIGHT_DON   =   4,
-    RIGHT_KAT   =   8,
+    KEY_LEFT_DON    =   1,
+    KEY_LEFT_KAT    =   2,
+    KEY_RIGHT_DON   =   4,
+    KEY_RIGHT_KAT   =   8,
+    KEY_DON_MASK    = KEY_LEFT_DON | KEY_RIGHT_DON,
+    KEY_KAT_MASK    = KEY_LEFT_KAT | KEY_RIGHT_KAT,
 };
 
 enum std_keys {
-    MOUSE_LEFT   =  1,
-    MOUSE_RIGHT  =  2,
-    KEY_LEFT     =  4 + 1,
-    KEY_RIGHT    =  8 + 2,
-    SMOKE        =  16,
+    KEY_MOUSE_LEFT     =  1,
+    KEY_MOUSE_RIGHT    =  2,
+    KEY_LEFT           =  4 + 1,
+    KEY_RIGHT          =  8 + 2,
+    KEY_KEYBOARD_SMOKE =  16,
 
-    HIT_KEY = KEY_LEFT | KEY_RIGHT,
+    KEY_HIT_MASK  = KEY_LEFT | KEY_RIGHT,
 };
 
-#define HIT_KEY_PRESSED(key) ((key) & HIT_KEY)
+#define HIT_KEY_PRESSED(key) ((key) & KEY_HIT_MASK)
 
 enum ctb_keys {
     CTB_DASH = 1

@@ -8,35 +8,38 @@ G_BEGIN_DECLS
 
 typedef struct osux_hit_ osux_hit;
 
+typedef enum osux_hit_type_ osux_hit_type;
+typedef struct osux_keypress_ osux_keypress;
+typedef struct osux_hits_ osux_hits;
+
 #include <osux/util.h>
 #include <osux/mods.h>
 #include <osux/hitobject.h>
 #include <osux/replay.h>
 
-extern char const *hit_str[];
-
-typedef enum osux_hit_type_ {
+enum osux_hit_type_ {
     HIT_RAINBOW_300 = 0,
     HIT_300,
     HIT_200,
     HIT_100,
     HIT_50,
     HIT_MISS,
+    HIT_SPECIAL, // for shaker and roll in taiko
     MAX_HIT_TYPE
-} osux_hit_type;
+};
 
 struct osux_hit_ {
     osux_hit_type hit_type;
     bool hitted; // can be true even if hit_type == hit_miss
 };
 
-typedef struct osux_keypress_ {
+struct osux_keypress_ {
     int64_t offset;
     uint32_t key;
-    bool release;
-} osux_keypress;
+    bool is_release;
+};
 
-typedef struct osux_hits_ {
+struct osux_hits_ {
     int game_mode;
     int mods;
     int overall_difficulty;
@@ -50,7 +53,7 @@ typedef struct osux_hits_ {
     /* public */
     osux_hit *hits;
     size_t hits_size;
-} osux_hits;
+};
 
 void osux_get_hit_windows(
     double window[], // Array of size MAX_HIT_TYPE to be filled by this function

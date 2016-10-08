@@ -37,6 +37,7 @@ int osux_beatmap_free(osux_beatmap *beatmap)
 
     g_strfreev(beatmap->tags);
     g_free(beatmap->colors);
+    g_list_free(beatmap->combo_colours);
 
     for (unsigned i = 0; i < beatmap->timingpoint_count; ++i)
 	osux_timingpoint_free(&beatmap->timingpoints[i]);

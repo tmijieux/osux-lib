@@ -3,32 +3,23 @@
 #include "osux/keys.h"
 #include "osux/replay.h"
 #include "osux/beatmap.h"
+#include "osux/hitobject.h"
+#include "osux/hitsound.h"
 
-static unsigned base_window[] = {
-    [HIT_RAINBOW_300] = 50,  // guess
-    [HIT_300]         = 80,
-    [HIT_200]         = 110, // guess
-    [HIT_100]         = 140,
-    [HIT_50]          = 200,
-    [HIT_MISS]        = 370, // guess
+struct hit_window {
+    unsigned base;
+    unsigned step;
+    char const *name;
 };
 
-static unsigned step_window[] = {
-    [HIT_RAINBOW_300] = 5, // guess
-    [HIT_300]         = 6,
-    [HIT_200]         = 7, // guess
-    [HIT_100]         = 8,
-    [HIT_50]          = 10,
-    [HIT_MISS]        = 12,
-};
-
-char const *hit_str[] = {
-    [HIT_RAINBOW_300] = "MAX",
-    [HIT_50] = "50",
-    [HIT_100] = "100",
-    [HIT_200] = "200",
-    [HIT_300] = "300",
-    [HIT_MISS] = "miss",
+struct hit_window hwindow[MAX_HIT_TYPE] = {
+    [HIT_RAINBOW_300] = { 50,  5,  "MAX" },
+    [HIT_300]         = { 80,  6,  "300" },
+    [HIT_200]         = { 110, 7,  "200" },
+    [HIT_100]         = { 140, 8,  "100" },
+    [HIT_50]          = { 200, 10, "50" },
+    [HIT_MISS]        = { 370, 12, "miss" },
+    [HIT_SPECIAL]     = { 0,   0,  "special" },
 };
 
 static double base_hit_window(
@@ -78,7 +69,7 @@ void osux_get_hit_windows(
 
     for (unsigned iHit = 0; iHit < MAX_HIT_TYPE; ++iHit) {
         window[iHit] = base_hit_window(
-            od, base_window[iHit], step_window[iHit]);
+            od, hwindow[iHit].base, hwindow[iHit].step);
 
         if (mods & MOD_DOUBLETIME)
             window[iHit] *= TWO_THIRD;
@@ -90,9 +81,8 @@ void osux_get_hit_windows(
 static void print_hit_windows(double window[])
 {
     for (unsigned i = 0; i < MAX_HIT_TYPE; ++i)
-        printf("hit_window '%s': %g\n", hit_str[i], window[i]);
+        printf("hit_window '%s': %g\n", hwindow[i].name, window[i]);
 }
-
 
 #define HIT_KEY_DIFF(d1, d2)                                    \
     (HIT_KEY_PRESSED((d1)->keys) ^ HIT_KEY_PRESSED((d2)->keys))
@@ -111,14 +101,25 @@ static int get_hit_type_std(double window[], int64_t distance)
         return HIT_MISS;
 }
 
-static int get_hit_type_taiko(double window[], int64_t distance)
+
+#define TAIKO_KEY_MATCH(KEY_, TYPE_)                    \
+    ((((KEY_) & KEY_DON_MASK)                           \
+      && ((KEY_) & ~KEY_KAT_MASK)                       \
+      && ((TYPE_) == SAMPLE_TAIKO_DON /* == 0*/))       \
+     ||  ((((KEY_) & KEY_KAT_MASK)                      \
+           && ((KEY_) & ~KEY_DON_MASK)                  \
+           && ((TYPE_) & SAMPLE_TAIKO_KAT))))           \
+
+
+static int
+get_hit_type_taiko(double window[], int64_t distance, int key, int object_type)
 {
     distance = labs(distance);
 
     if (distance < window[HIT_300])
-        return HIT_300;
+        return TAIKO_KEY_MATCH(key, object_type) ? HIT_300 : HIT_MISS;
     else if (distance < window[HIT_50])
-        return HIT_100;
+        return TAIKO_KEY_MATCH(key, object_type) ? HIT_100 : HIT_MISS;
     else
         return HIT_MISS;
 }
@@ -168,10 +169,12 @@ static unsigned bit_set_count(uint32_t value)
     return count;
 }
 
-// remove double keypress in standart difficulties replay
-// these double appear because keyboard hit key will also flag as
-// mouse hit key (this is the reason why you cant click with mouse when
-// your mouse keys are pressed
+/**
+ * remove double keypress in standart difficulties replay
+ * these double appear because keyboard hit key will also flag as
+ * mouse hit key (this is the reason why you cant click with mouse when
+ * your mouse keys are pressed
+ */
 static void keypress_remove_doubles(osux_hits *h)
 {
     if ((h->game_mode != GAME_MODE_STD && h->game_mode != GAME_MODE_TAIKO)
@@ -190,7 +193,7 @@ static void keypress_remove_doubles(osux_hits *h)
     for (unsigned i = 1; i < h->keypress_count; ++i) {
         unsigned or_key = kp[i].key | kp[i-1].key;
         if ((kp[i].offset == kp[i-1].offset) &&
-            (kp[i].release == kp[i-1].release) &&
+            (kp[i].is_release == kp[i-1].is_release) &&
             (or_key == KEY_LEFT || or_key == KEY_RIGHT)) {
             // skip if this is the same keypress
             continue;
@@ -204,8 +207,10 @@ static void keypress_remove_doubles(osux_hits *h)
     h->keypress_count = unique_kp_size;
 }
 
-static int osux_hits_compute_data(
-    osux_hits *h, osux_replay_data const *data, size_t data_count)
+static int
+osux_hits_compute_data(osux_hits *h,
+                       osux_replay_data const *data,
+                       size_t data_count)
 {
     ALLOC_ARRAY(h->data, h->data_count, data_count-2);
     COPY_ARRAY(h->data+1, data+2, data_count-3); // evict first, second and last
@@ -216,10 +221,10 @@ static int osux_hits_compute_data(
 
 static int osux_hits_compute_keypress(osux_hits *h)
 {
-    size_t keypress_cap;
+    size_t keypress_capacity;
     osux_replay_data *data = h->data;
     h->keypress_count = 0;
-    ALLOC_ARRAY(h->keypress, keypress_cap, 500);
+    ALLOC_ARRAY(h->keypress, keypress_capacity, 500);
 
     for (unsigned i = 1; i < h->data_count; ++i) {
         int keys_diff = HIT_KEY_DIFF(&data[i], &data[i-1]);
@@ -227,16 +232,13 @@ static int osux_hits_compute_keypress(osux_hits *h)
             unsigned key_count = bit_set_count(keys_diff);
             HANDLE_ARRAY_SIZE(h->keypress,
                               h->keypress_count+key_count,
-                              keypress_cap);
-            for (unsigned k = 1; k <= key_count; ++k) {
+                              keypress_capacity);
 
+            for (unsigned k = 1; k <= key_count; ++k) {
                 osux_keypress *kp = &h->keypress[h->keypress_count];
                 kp->offset = data[i].time_offset;
                 kp->key = get_nth_bit_set(keys_diff, k);
-                if (kp->key & data[i].keys)
-                    kp->release = false;
-                else
-                    kp->release = true;
+                kp->is_release = (kp->key & data[i].keys) == 0;
                 ++ h->keypress_count;
             }
         }
@@ -250,7 +252,8 @@ void osux_hits_print_keypress(osux_hits *h)
     for (unsigned i = 0; i < h->keypress_count; ++i) {
         osux_keypress *kp = &h->keypress[i];
         print_time_offset_human_readable(kp->offset);
-        printf(" | key=%u -- %s\n", kp->key, kp->release ? "RELEASE" : "PRESS");
+        printf(" | key=%u -- %s\n", kp->key,
+               kp->is_release ? "RELEASE" : "PRESS");
     }
 }
 
@@ -260,26 +263,28 @@ void osux_hits_print_keypress(osux_hits *h)
 static int osux_hits_compute_hits_std_basic(
     osux_hits *h, osux_beatmap const *beatmap)
 {
-    double window[MAX_HIT_TYPE];
-    osux_keypress *p_keypress = h->keypress;
-    osux_keypress *keypresses_end = h->keypress + h->keypress_count;
-    osux_hitobject *p_hitobject;
-    osux_hitobject *hitobjects_end = beatmap->hitobjects + beatmap->hitobject_count;
-    int i_hitobject;
+    int iObject;
     int64_t max_distance = 0;
+    double window[MAX_HIT_TYPE];
+    osux_keypress *p_keypress, *keypress_end;
+    osux_hitobject *p_hitobject, *hitobjects_end;
+
+    p_keypress = h->keypress;
+    keypress_end = h->keypress + h->keypress_count;
+    hitobjects_end = beatmap->hitobjects + beatmap->hitobject_count;
 
     osux_get_hit_windows(window, h->overall_difficulty, h->mods);
     ALLOC_ARRAY(h->hits, h->hits_size, beatmap->hitobject_count);
 
-    for ( p_hitobject = &beatmap->hitobjects[0], i_hitobject = 0;
+    for ( p_hitobject = &beatmap->hitobjects[0], iObject = 0;
           p_hitobject != hitobjects_end;
-          ++ p_hitobject, ++ i_hitobject   )
+          ++ p_hitobject, ++ iObject   )
     {
         int64_t distance = time_distance( p_keypress, p_hitobject );
         max_distance = max(max_distance, labs(distance));
 
         // get first key press in (miss) hit window
-        while ((p_keypress != keypresses_end && p_keypress->release)
+        while ((p_keypress != keypress_end && p_keypress->is_release)
                || distance < -window[HIT_MISS])
         {
             ++ p_keypress;
@@ -289,10 +294,10 @@ static int osux_hits_compute_hits_std_basic(
         // free win spinner
         if (HIT_OBJECT_IS_SPINNER(p_hitobject))
         {
-            h->hits[i_hitobject].hit_type = HIT_300;
-            h->hits[i_hitobject].hitted = true;
+            h->hits[iObject].hit_type = HIT_300;
+            h->hits[iObject].hitted = true;
 
-            while (p_keypress != keypresses_end &&
+            while (p_keypress != keypress_end &&
                    p_keypress->offset < p_hitobject->end_offset)
             {
                 // get out of spinner
@@ -303,28 +308,28 @@ static int osux_hits_compute_hits_std_basic(
 
         // if no keypress in the hit window, that's a miss
         if (distance > window[HIT_50]) {
-            h->hits[i_hitobject].hitted = false;
-            h->hits[i_hitobject].hit_type = HIT_MISS;
+            h->hits[iObject].hitted = false;
+            h->hits[iObject].hit_type = HIT_MISS;
 
             if (distance < window[HIT_MISS] && HIT_OBJECT_IS_SLIDER(p_hitobject))
             {
-                h->hits[i_hitobject].hit_type = HIT_300;
-                h->hits[i_hitobject].hitted = true;
+                h->hits[iObject].hit_type = HIT_300;
+                h->hits[iObject].hitted = true;
                 ++ p_keypress;
                 continue;
             }
             printf("missed 'after' distance=%ld, hit_offset=%ld, ho_offset=%ld\n",
                    distance, p_keypress->offset, p_hitobject->offset);
         } else {
-            h->hits[i_hitobject].hitted = true;
+            h->hits[iObject].hitted = true;
             if (HIT_OBJECT_IS_CIRCLE(p_hitobject))
-                h->hits[i_hitobject].hit_type = get_hit_type_std(window, distance);
+                h->hits[iObject].hit_type = get_hit_type_std(window, distance);
             else
                 // free win slider
-                h->hits[i_hitobject].hit_type = HIT_300;
+                h->hits[iObject].hit_type = HIT_300;
 
             printf("hit %s distance=%ld, hit_offset=%ld, ho_offset=%ld\n",
-                   hit_str[h->hits[i_hitobject].hit_type], distance,
+                   hwindow[h->hits[iObject].hit_type].name, distance,
                    p_keypress->offset, p_hitobject->offset);
             ++ p_keypress;
         }
@@ -342,39 +347,42 @@ static int osux_hits_compute_hits_std_basic(
 static int osux_hits_compute_hits_taiko_basic(
     osux_hits *h, osux_beatmap const *beatmap)
 {
-    double window[MAX_HIT_TYPE];
-    osux_keypress *p_keypress = h->keypress;
-    osux_keypress *keypresses_end = h->keypress + h->keypress_count;
-    osux_hitobject *p_hitobject;
-    osux_hitobject *hitobjects_end = beatmap->hitobjects + beatmap->hitobject_count;
-    int i_hitobject;
+    int iObject;
     int64_t max_distance = 0;
+    double window[MAX_HIT_TYPE];
+    osux_keypress *p_keypress, *keypress_end;
+    osux_hitobject *p_hitobject, *hitobjects_end;
+
+    p_keypress = h->keypress;
+    keypress_end = h->keypress + h->keypress_count;
+    hitobjects_end = beatmap->hitobjects + beatmap->hitobject_count;
 
     osux_get_hit_windows(window, h->overall_difficulty, h->mods);
     ALLOC_ARRAY(h->hits, h->hits_size, beatmap->hitobject_count);
 
-    for ( p_hitobject = &beatmap->hitobjects[0], i_hitobject = 0;
+    for ( p_hitobject = &beatmap->hitobjects[0], iObject = 0;
           p_hitobject != hitobjects_end;
-          ++ p_hitobject, ++ i_hitobject   )
+          ++ p_hitobject, ++ iObject   )
     {
         int64_t distance = time_distance( p_keypress, p_hitobject );
 
         // get first key press in (miss) hit window
-        while ((p_keypress != keypresses_end && p_keypress->release)
+        while ((p_keypress != keypress_end && p_keypress->is_release)
                || distance < -window[HIT_50])
         {
             ++ p_keypress;
             distance = time_distance( p_keypress, p_hitobject );
         }
 
-
-        // free win shaker/spinner
-        if (HIT_OBJECT_IS_SPINNER(p_hitobject) || HIT_OBJECT_IS_SLIDER(p_hitobject))
+        // shaker/spinner
+        if (HIT_OBJECT_IS_SPINNER(p_hitobject)
+            || HIT_OBJECT_IS_SLIDER(p_hitobject))
         {
-            h->hits[i_hitobject].hit_type = HIT_300;
-            h->hits[i_hitobject].hitted = true;
+            h->hits[iObject].hit_type = HIT_SPECIAL;
+            h->hits[iObject].hitted = true;
+            printf("bonus\n");
 
-            while (p_keypress != keypresses_end &&
+            while (p_keypress != keypress_end &&
                    p_keypress->offset < p_hitobject->end_offset)
             {
                 // get out of shaker/spinner
@@ -385,28 +393,38 @@ static int osux_hits_compute_hits_taiko_basic(
 
         // if no keypress in the hit window, that's a miss
         if (distance > window[HIT_50]) {
-            h->hits[i_hitobject].hitted = false;
-            h->hits[i_hitobject].hit_type = HIT_MISS;
-            printf("hit %s distance=%ld, hit_offset=%ld, ho_offset=%ld\n",
-                   hit_str[h->hits[i_hitobject].hit_type], distance,
+            h->hits[iObject].hitted = false;
+            h->hits[iObject].hit_type = HIT_MISS;
+            printf("hit %s MISS distance=%ld, hit_offset=%ld, ho_offset=%ld\n",
+                   hwindow[h->hits[iObject].hit_type].name, distance,
                    p_keypress->offset, p_hitobject->offset);
+
+            //printf("MISS,");
         } else {
-            h->hits[i_hitobject].hitted = true;
-            if (HIT_OBJECT_IS_CIRCLE(p_hitobject)) {
-                h->hits[i_hitobject].hit_type =
-                    get_hit_type_taiko(window, distance);
-            } else
-                // free win slider
-                h->hits[i_hitobject].hit_type = HIT_300;
-            printf("hit %s distance=%ld, hit_offset=%ld, ho_offset=%ld\n",
-                   hit_str[h->hits[i_hitobject].hit_type], distance,
-                   p_keypress->offset, p_hitobject->offset);
+            int hit_type;
+            h->hits[iObject].hitted = true;
+            assert(HIT_OBJECT_IS_CIRCLE(p_hitobject));
+            hit_type = get_hit_type_taiko(
+                window, distance, p_keypress->key,
+                p_hitobject->hitsound.sample_type
+            );
+
+            h->hits[iObject].hit_type = hit_type;
+            //printf("%s,", hwindow[hit_type].name);
+            printf("hit %s HIT distance=%ld, hit_offset=%ld, "
+                   "ho_offset=%ld, keymatch=%s\n",
+                   hwindow[h->hits[iObject].hit_type].name, distance,
+                   p_keypress->offset, p_hitobject->offset,
+                   TAIKO_KEY_MATCH(
+                       p_keypress->key,
+                       p_hitobject->hitsound.sample_type) ? "true":"false");
 
             max_distance = max(max_distance, labs(distance));
             ++ p_keypress;
         }
     }
 
+    printf("\n");
     print_hit_windows(window);
     printf("OD: %g\n", beatmap->OverallDifficulty);
     printf("max_distance: %ld\n", max_distance);
@@ -427,6 +445,7 @@ static void print_hit_stats(int hit_stats[])
     printf("100: %d\n", hit_stats[HIT_100]);
     printf("50: %d\n", hit_stats[HIT_50]);
     printf("MISS: %d\n", hit_stats[HIT_MISS]);
+    printf("special: %d\n", hit_stats[HIT_SPECIAL]);
 }
 
 int osux_hits_free(osux_hits *h)

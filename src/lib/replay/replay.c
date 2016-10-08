@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-#include <locale.h>
 
 #include "osux/game_mode.h"
 #include "osux/util.h"
@@ -91,18 +90,11 @@ static time_t from_win_timestamp(uint64_t ticks)
 
 static void print_date(FILE *f, time_t t)
 {
-    static gboolean locale_is_set = FALSE;
-
-    if (!locale_is_set) {
-        setlocale(LC_ALL, ""); // TODO: move this
-        locale_is_set = TRUE;
-    }
-
     GDateTime *dateTime = g_date_time_new_from_unix_local(t);
     g_assert(dateTime != NULL);
 
     gchar *dateStr = g_date_time_format(dateTime, "%c");
-    fprintf(f, "date: %s\n", dateStr);
+    fprintf(f, "date: %s\n", dateStr != NULL ? dateStr : "INVALID");
     g_free(dateStr);
     g_date_time_unref(dateTime);
 }
@@ -151,9 +143,9 @@ static int parse_life_graph(osux_replay *r, char const *life_graph)
     return err;
 }
 
-#define READ_S(handle_, var_) \
+#define READ_S(handle_, var_)                           \
     osux_buffer_reader_read_string(&(handle_), &(var_))
-#define READ_V(handle_, var_) \
+#define READ_V(handle_, var_)                                   \
     osux_buffer_reader_read(&(handle_), &(var_), sizeof (var_))
 
 int osux_replay_init(osux_replay *r, char const *filepath)
@@ -183,8 +175,8 @@ int osux_replay_init(osux_replay *r, char const *filepath)
     READ_V(br, r->_miss);
 
     READ_V(br, r->score);
-    READ_V(br, r->max_combo);
-    READ_V(br, r->fc);
+    READ_V(br, r->greatest_combo);
+    READ_V(br, r->is_full_combo);
     READ_V(br, r->mods);
 
     char *life_graph = NULL;
@@ -200,9 +192,11 @@ int osux_replay_init(osux_replay *r, char const *filepath)
     READ_V(br, ticks);
     r->timestamp = from_win_timestamp(ticks);
 
-    READ_V(br, r->replay_length);
+    uint32_t replay_length;
     char *data = NULL;
-    osux_buffer_reader_read_lzma(&br, &data, r->replay_length);
+
+    READ_V(br, replay_length);
+    osux_buffer_reader_read_lzma(&br, &data, replay_length);
     if ((err = parse_replay_data(r, data)) < 0) {
         osux_replay_free(r);
         osux_buffer_reader_free(&br);
@@ -229,27 +223,23 @@ void osux_replay_print(osux_replay const *r, FILE *f)
 
     fprintf(f, "miss: %u\n", r->_miss);
     fprintf(f, "Score: %u\n", r->score);
-    fprintf(f, "MaxCombo: %u\n", r->max_combo);
-    fprintf(f, "FullCombo: %u\n", r->fc);
+    fprintf(f, "Greatest Combo: %u\n", r->greatest_combo);
+    fprintf(f, "FullCombo: %s\n", r->is_full_combo ? "Yes" : "No");
     fputs("Mods: ", f);  mod_print(f, r->mods); fputs("\n", f);
     fprintf(f, "Life Graph: "/*%s\n", r->lifebar_graph*/);
 
     for (unsigned i = 0; i < r->life_count; ++i) {
         osux_replay_life *l = &r->life[i];
-        g_fprintf(f, "%"G_GUINT64_FORMAT"|%lg,",
-                  l->time_offset, l->life_amount);
+        fprintf(f, "%ld|%g, ", l->time_offset, l->life_amount);
     }
     fprintf(f, "\n");
-
     print_date(f, r->timestamp);
 
-    fprintf(f, "Replay size: %u bytes\n\n", r->replay_length);
     fprintf(f, "Data:\n");
-
     for (unsigned i = 0; i < r->data_count; ++i) {
         osux_replay_data *d = &r->data[i];
-    	g_fprintf(f, "%"G_GINT64_FORMAT"|%g|%g|%u\n",
-                  d->previous_time, d->x, d->y, d->keys);
+        fprintf(f, "%ld|%g|%g|%u\n", d->previous_time, d->x, d->y, d->keys);
+        //fprintf(f, "blah!\n");
     }
 }
 

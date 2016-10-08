@@ -22,22 +22,22 @@ typedef struct osux_event_command_ osux_event_command;
     OBJECT(1, N_("Video"),           1, VIDEO, parse_video_object)      \
     OBJECT(2, N_("BreakPeriod"),     0, BREAK, parse_break_period_object) \
     OBJECT(3, N_("BackgroundColour"),0, BACKGROUND_COLOUR, parse_bg_colour_object) \
-    OBJECT(4, N_("Sprite"),          1,  SPRITE, parse_sprite_object)   \
+    OBJECT(4, N_("Sprite"),          1, SPRITE, parse_sprite_object)    \
     OBJECT(5, N_("Sample"),          1, SAMPLE, parse_sample_object)    \
-    OBJECT(6, N_("Animation"),       1,  ANIMATION, parse_animation_object) \
+    OBJECT(6, N_("Animation"),       1, ANIMATION, parse_animation_object) \
 
 #define EVENT_COMMANDS(COMMAND)                                         \
-    COMMAND(FADE, N_("Fade"), F, parse_fade_cmd)                        \
-    COMMAND(MOVE, N_("Move"), M, parse_move_cmd)                        \
-    COMMAND(MOVE_X, N_("MoveX"), MX, parse_movex_cmd)                   \
-    COMMAND(MOVE_Y, N_("MoveY"), MY, parse_movey_cmd)                   \
-    COMMAND(SCALE, N_("Scale"), S, parse_scale_cmd)                     \
+    COMMAND(FADE,         N_("Fade"),      F, parse_fade_cmd)           \
+    COMMAND(MOVE,         N_("Move"),      M, parse_move_cmd)           \
+    COMMAND(MOVE_X,       N_("MoveX"),     MX, parse_movex_cmd)         \
+    COMMAND(MOVE_Y,       N_("MoveY"),     MY, parse_movey_cmd)         \
+    COMMAND(SCALE,        N_("Scale"),     S, parse_scale_cmd)          \
     COMMAND(VECTOR_SCALE, N_("VectorScale"), V, parse_vscale_cmd)       \
-    COMMAND(ROTATE, N_("Rotate"), R, parse_rotate_cmd)                  \
-    COMMAND(COLOR, N_("Color"), C, parse_color_cmd)                     \
-    COMMAND(PARAMETER, N_("Parameter"), P, parse_parameter_cmd)         \
-    COMMAND(LOOP, N_("Loop"), L, parse_loop_cmd)                        \
-    COMMAND(TRIGGER, N_("Trigger"), T, parse_trigger_cmd)               \
+    COMMAND(ROTATE,       N_("Rotate"),    R, parse_rotate_cmd)         \
+    COMMAND(COLOR,        N_("Color"),     C, parse_color_cmd)          \
+    COMMAND(PARAMETER,    N_("Parameter"), P, parse_parameter_cmd)      \
+    COMMAND(LOOP,         N_("Loop"),      L, parse_loop_cmd)           \
+    COMMAND(TRIGGER,      N_("Trigger"),   T, parse_trigger_cmd)        \
 
 #define EVENT_LAYERS(LAYER)                     \
     LAYER(0,  N_("Background"), BACKGROUND)     \
@@ -80,9 +80,9 @@ struct osux_event_command_ {
 
     double o1, o2;   // opacity
     double s1, s2;   // scale
-    double sx1, sx2;   // scale x
-    double sy1, sy2;   // scale y
-    double a1, a2; // radian
+    double sx1, sx2; // scale x
+    double sy1, sy2; // scale y
+    double a1, a2;   // radian
 
     int x1; int y1;
     int x2; int y2;
@@ -128,7 +128,6 @@ char const *osux_event_detail_string(osux_event *ev);
 #define EVENT_IS_COMMAND(ev)  (!!((ev)->level))
 #define EVENT_TYPE_IS_COMPOUND(type)                                    \
     ((type) == EVENT_COMMAND_TRIGGER || (type) == EVENT_COMMAND_LOOP)
-
 
 #include "./event_string.h"
 

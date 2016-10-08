@@ -25,7 +25,9 @@
 
 typedef struct osux_replay_data_ osux_replay_data;
 typedef struct osux_replay_life_ osux_replay_life;
+
 typedef struct osux_replay_ osux_replay;
+typedef struct osux_replay_ osux_score;
 
 #include <osux/beatmap.h>
 #include <osux/hit.h>
@@ -33,8 +35,7 @@ typedef struct osux_replay_ osux_replay;
 G_BEGIN_DECLS
 
 struct osux_replay_data_ {
-    uint64_t time_offset;
-
+    int64_t time_offset;
     int64_t previous_time;
     double x;
     double y;
@@ -53,31 +54,23 @@ struct osux_replay_ {
     char *player_name;
     char *replay_hash;
 
-    uint16_t _300; // [ taiko: 100%, great, 300pts], mania: 300(not MAX)
+    uint16_t _300;  // [ taiko: 100%, great, 300pts], mania: 300(not MAX)
     uint16_t _100;  // [taiko: 50%, good, 150pts] , mania: 200
     uint16_t _50;   // ctb: small fruits
     uint16_t _geki; // taiko: big great (100%), mania: MAX
-    uint16_t _katu; //taiko: big good (50%), mania 100
+    uint16_t _katu; // taiko: big good (50%), mania 100
     uint16_t _miss;
 
     uint32_t score;
-    uint16_t max_combo; // max combo of score, not map
-
-    uint8_t fc;
-    uint32_t mods;  // this is a bitfield, see general/mods.h
-
-    /* list of time|life separated by commas,  where time is in milliseconds
-       and life is a percentage this represent the graph of life
-       during the play  */
-
-    uint32_t life_count;
-    osux_replay_life *life;
+    uint16_t greatest_combo;
+    uint8_t is_full_combo;
+    uint32_t mods;  // gameplay mods (i.e HD, FL, DT ...)
 
     /* the date and time of the play  */
     time_t timestamp;
 
-    /* number of bytes in the compressed lzma stream */
-    uint32_t replay_length;
+    uint32_t life_count;
+    osux_replay_life *life;
 
     uint64_t data_count;
     osux_replay_data *data;
