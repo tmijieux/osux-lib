@@ -108,10 +108,8 @@ osux_yaml_new_from_file(char const *filepath)
     osux_stack *container_stack;
 
     f = g_fopen(filepath, "r");
-    if (f == NULL) {
-	osux_error("%s: %s\n", filepath, strerror(errno));
+    if (f == NULL)
 	return NULL;
-    }
     memset(&parser, 0, sizeof parser);
     if (!yaml_parser_initialize(&parser)) {
         fclose(f);
