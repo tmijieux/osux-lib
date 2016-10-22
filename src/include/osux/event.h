@@ -102,10 +102,8 @@ struct osux_event_ {
     int offset;
     int end_offset;
 
-    union {
-        osux_event_object object;
-        osux_event_command command;
-    };
+    osux_event_object object;
+    osux_event_command command;
 
     uint32_t osu_version;
     osux_event *parent;
