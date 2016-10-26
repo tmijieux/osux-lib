@@ -76,7 +76,6 @@ char const *osux_errmsg(int errcode);
         fprintf(stderr, "FATAL ERROR: %s:%d|%s: ",  __FILENAME__ ,      \
                 __LINE__, __PRETTY_FUNCTION__);                         \
         fprintf(stderr, (format_), ##__VA_ARGS__);                      \
-        osux_error(format_, ##__VA_ARGS__);                             \
         exit(EXIT_FAILURE);                                             \
     } while(0)
 
