@@ -10,6 +10,8 @@ G_BEGIN_DECLS
 
 #define OSUX_EVENT_HEADER_INSIDE
 
+#define EVENT_MAX_STACK_SIZE 200
+
 typedef struct osux_event_ osux_event;
 typedef struct osux_event_object_ osux_event_object;
 typedef struct osux_event_command_ osux_event_command;
@@ -114,7 +116,7 @@ struct osux_event_ {
 
 int osux_event_init(osux_event *event, char *line, uint32_t osu_version);
 int osux_event_free(osux_event *event);
-int osux_event_build_tree(osux_event *event);
+int osux_event_build_tree(osux_event **ev_stack, osux_event *event);
 int osux_event_prepare(osux_event *ev);
 void osux_event_print(osux_event *ev, FILE *f);
 

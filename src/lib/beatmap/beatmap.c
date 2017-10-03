@@ -95,7 +95,7 @@ static int parse_osu_version(osux_beatmap *beatmap, GIOChannel *file)
         err = -OSUX_ERR_BAD_OSU_VERSION;
     }
 
-finally:
+  finally:
     g_free(line);
     g_match_info_free(info);
     return err;
@@ -371,7 +371,7 @@ static void
 prepare_colors(osux_beatmap *beatmap)
 {
     if (!osux_color_array_contains_type(
-        beatmap->colors, beatmap->color_count, COLOR_COMBO))
+            beatmap->colors, beatmap->color_count, COLOR_COMBO))
     {
         osux_color c;
         osux_color_init(&c, "Combo1 : 255,192,0", 15);
@@ -426,10 +426,12 @@ int osux_beatmap_prepare(osux_beatmap *beatmap)
     err = prepare_hitobjects(beatmap);
 
     // build the event tree
+    osux_event **ev_stack = g_malloc0(EVENT_MAX_STACK_SIZE * sizeof ev_stack[0]);
     for (uint32_t i = 0; !err && i < beatmap->event_count; ++i) {
 	osux_event *ev = &beatmap->events[i];
-        err = osux_event_build_tree(ev);
+        err = osux_event_build_tree(ev_stack, ev);
     }
+    g_free(ev_stack);
     for (uint32_t i = 0; !err && i < beatmap->event_count; ++i) {
 	osux_event *ev = &beatmap->events[i];
         err = osux_event_prepare(ev);

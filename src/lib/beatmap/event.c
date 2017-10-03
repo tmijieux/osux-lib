@@ -37,7 +37,8 @@ static int add_child(osux_event *parent, osux_event *child)
              parent->type == EVENT_COMMAND_LOOP || // ... or special commands
              parent->type == EVENT_COMMAND_TRIGGER);
     HANDLE_ARRAY_SIZE(parent->childs, parent->child_count, parent->child_bufsize);
-    parent->childs[parent->child_count++] = child;
+    parent->childs[parent->child_count] = child;
+    ++parent->child_count;
     child->parent = parent;
     return 0;
 }
@@ -88,6 +89,7 @@ static int parse_object_event(osux_event *event, char **split, unsigned size)
     EVENT_OBJECTS(MATCH_OBJECT__);
     return -OSUX_ERR_INVALID_EVENT_OBJECT;
 }
+
 static int parse_command_event(osux_event *event, char **split, unsigned size)
 {
     if (!size)
@@ -165,8 +167,8 @@ static int parse_video_object(
     return 0;
 }
 
-static int parse_break_period_object(
-    osux_event *ev, char **split, unsigned size)
+static int
+parse_break_period_object(osux_event *ev, char **split, unsigned size)
 {
     if (size != 3)
         return -OSUX_ERR_INVALID_EVENT_OBJECT;
@@ -175,8 +177,8 @@ static int parse_break_period_object(
     return 0;
 }
 
-static int parse_bg_colour_object(
-    osux_event *ev, char **split, unsigned size)
+static int
+parse_bg_colour_object(osux_event *ev, char **split, unsigned size)
 {
     if (size != 5)
         return -OSUX_ERR_INVALID_EVENT_OBJECT;
@@ -189,8 +191,8 @@ static int parse_bg_colour_object(
     return 0;
 }
 
-static int parse_sprite_object(
-    osux_event *ev, char **split, unsigned size)
+static int
+parse_sprite_object(osux_event *ev, char **split, unsigned size)
 {
     if (size != 6)
         return -OSUX_ERR_INVALID_EVENT_OBJECT;
@@ -204,8 +206,8 @@ static int parse_sprite_object(
     return 0;
 }
 
-static int parse_sample_object(
-    osux_event *ev, char **split, unsigned size)
+static int
+parse_sample_object(osux_event *ev, char **split, unsigned size)
 {
     if (size < 4)
         return -OSUX_ERR_INVALID_EVENT_OBJECT;
@@ -218,8 +220,8 @@ static int parse_sample_object(
     return 0;
 }
 
-static int parse_animation_object(
-    osux_event *ev, char **split, unsigned size)
+static int
+parse_animation_object(osux_event *ev, char **split, unsigned size)
 {
     if (size < 8)
         return -OSUX_ERR_INVALID_EVENT_OBJECT;
@@ -278,10 +280,7 @@ int osux_event_free(osux_event *event)
     return 0;
 }
 
-#define EVENT_MAX_STACK_SIZE 200
-static osux_event *event_stack[EVENT_MAX_STACK_SIZE] = { NULL, };
-
-int osux_event_build_tree(osux_event *event)
+int osux_event_build_tree(osux_event **event_stack, osux_event *event)
 {
     if (event->level >= EVENT_MAX_STACK_SIZE)
         return -OSUX_ERR_MEMORY_TOO_MUCH_NESTED_EVENT;

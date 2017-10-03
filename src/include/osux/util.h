@@ -10,17 +10,17 @@ G_BEGIN_DECLS
 
 #define HANDLE_ARRAY_SIZE(array, array_size, array_capacity)            \
     do {                                                                \
-        if (array_size+1 > array_capacity) {                            \
-            array_capacity = 2*(array_capacity)+1;                      \
-            g_assert(array_capacity > array_size);                      \
-            array = g_realloc(array, sizeof(*(array)) * array_capacity); \
+        if ( ((array_size)+1) > (array_capacity)) {                     \
+            (array_capacity) = 2*(array_capacity)+1;                    \
+            g_assert((array_capacity) > (array_size));                  \
+            (array) = g_realloc((array), sizeof(*(array)) * (array_capacity)); \
         }                                                               \
     } while (0)                                                         \
 
 #define ALLOC_ARRAY(array_var, size_var, size)                  \
     do {                                                        \
-        array_var = g_malloc((size) * sizeof(*(array_var)));    \
-        size_var = (size);                                      \
+        (array_var) = g_malloc((size) * sizeof(*(array_var)));  \
+        (size_var) = (size);                                    \
     } while (0)
 
 #define ARRAY_APPEND(array, METHOD, ...)                                \
@@ -30,7 +30,7 @@ G_BEGIN_DECLS
         ++ array##_count;                                               \
     } while(0)
 
-#define ARRAY_DUP(array_var, size)                             \
+#define ARRAY_DUP(array_var, size)                              \
     (g_memdup((array_var), (size) * sizeof(*(array_var))))
 
 #define COPY_ARRAY(array_dst_var, array_src_var, size)                  \
